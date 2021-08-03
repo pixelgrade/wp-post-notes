@@ -1,0 +1,86 @@
+{
+    "name": "pixelgrade/wp-post-notes",
+    "description": "WordPress library for adding public and private notes to posts, pages, or any custom post type.",
+	"keywords": [
+	  "pixelgradelt",
+	  "pixelgrade",
+	  "wordpress",
+	  "notes",
+	  "post-notes",
+	  "cpt-notes",
+	  "custom-post-type-notes"
+	],
+    "type": "library",
+  	"homepage": "https://github.com/pixelgrade/wp-post-notes",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Vlad Olaru",
+            "email": "vlad@pixelgrade.com",
+		  	"homepage": "https://pixelgrade.com/"
+        }
+    ],
+	"support": {
+	  "issues": "https://github.com/pixelgrade/wp-post-notes/issues",
+	  "source": "https://github.com/pixelgrade/wp-post-notes"
+	},
+	"config": {
+	  "optimize-autoloader": true,
+	  "preferred-install": "dist",
+	  "sort-packages": true
+	},
+	"prefer-stable": true,
+	"repositories": {
+	  "wordpress": {
+		"type": "vcs",
+		"url": "https://github.com/WordPress/wordpress-develop",
+		"no-api": true
+	  }
+	},
+    "require": {
+	  "php": "^7.4"
+	},
+	"require-dev": {
+	  "brain/monkey": "^2.2",
+	  "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+	  "phpcompatibility/phpcompatibility-wp": "^2",
+	  "phpunit/phpunit": "^7.5",
+	  "roave/security-advisories": "dev-master",
+	  "squizlabs/php_codesniffer": "^3.3",
+	  "wordpress/wordpress": "^5.6",
+	  "wp-cli/i18n-command": "dev-master",
+	  "wp-coding-standards/wpcs": "^1"
+	},
+	"autoload": {
+	  "psr-4": {
+		"Pixelgrade\\WPPostNotes\\": "src/"
+	  },
+	  "files": [
+		"src/functions.php"
+	  ]
+	},
+	"autoload-dev": {
+	  "psr-4": {
+		"Pixelgrade\\WPPostNotes\\Tests\\": "tests/phpunit/"
+	  },
+	  "files": [
+
+	  ]
+	},
+	"scripts": {
+	  "install-codestandards": [
+		"Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run"
+	  ],
+	  "phpcs": "./vendor/bin/phpcs",
+	  "tests": "./vendor/bin/phpunit --colors=always",
+	  "tests-unit": "./vendor/bin/phpunit --testsuite=Unit --colors=always",
+	  "tests-integration": "./vendor/bin/phpunit --testsuite=Integration --colors=always",
+	  "makepot": "./vendor/bin/wp i18n make-pot . languages/pixelgradelt-records.pot",
+	  "prepare-for-release": [
+		"composer install",
+		"composer makepot",
+		"composer install --no-dev --prefer-dist",
+		"composer dump-autoload --no-dev --optimize"
+	  ]
+	}
+}
