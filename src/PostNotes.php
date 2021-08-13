@@ -195,7 +195,7 @@ class PostNotes {
 			],
 			'i18n'          => [
 				'add_post_note_label'  => esc_html__( 'Add note', 'pixelgrade-wppostnotes' ),
-				'add_post_note_tip'    => esc_html__( 'Add a note for your reference, or add a customer note (the user will be notified).', 'pixelgrade-wppostnotes' ),
+				'add_post_note_tip'    => esc_html__( 'Add a note for you or your team\'s reference.', 'pixelgrade-wppostnotes' ),
 				'post_note_type_label' => esc_html__( 'Note type', 'pixelgrade-wppostnotes' ),
 				/* translators: Add post note button label.  */
 				'add_post_note_button' => esc_html__( 'Add', 'pixelgrade-wppostnotes' ),

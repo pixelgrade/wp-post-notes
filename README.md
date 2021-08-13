@@ -6,6 +6,10 @@ WordPress library for adding public and private notes to posts, pages, or any cu
 
 WordPress library for adding public and private notes to posts, pages, or any custom post type.
 
+## Releases
+
+Before creating a new release zip, run the `composer run prepare-for-release` command to keep everything production-oriented.
+
 ## Running Tests
 
 To run the PHPUnit tests, in the root directory of the plugin, run something like:
