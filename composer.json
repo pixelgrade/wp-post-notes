@@ -1,11 +1,14 @@
 {
     "name": "pixelgrade/wp-post-notes",
-    "description": "WordPress library for adding public and private notes to posts, pages, or any custom post type.",
+  	"version": "0.5.0",
+    "description": "WordPress library for adding internal, private or public notes to posts, pages, or any custom post type.",
 	"keywords": [
 	  "pixelgradelt",
 	  "pixelgrade",
 	  "wordpress",
 	  "notes",
+	  "internal",
+	  "private",
 	  "post-notes",
 	  "cpt-notes",
 	  "custom-post-type-notes"

@@ -8,12 +8,23 @@ jQuery( function ( $ ) {
 		init: function() {
 			$( '#pixelgrade_wppostnotes-metabox' )
 				.on( 'click', 'button.add_note', this.add_post_note )
-				.on( 'click', 'a.delete_note', this.delete_post_note );
+				.on( 'click', 'a.delete_note', this.delete_post_note )
+				.on( 'init_tooltips', function() {
 
+					$( '.pixelgrade_wppostnotes-help-tip' ).tipTip( {
+						'attribute': 'data-tip',
+						'fadeIn': 50,
+						'fadeOut': 50,
+						'delay': 200,
+						'keepAlive': true
+					} );
+				});
+
+			$( '#pixelgrade_wppostnotes-metabox' ).trigger( 'init_tooltips' );
 		},
 
 		add_post_note: function() {
-			if ( ! $( 'textarea#add_post_note' ).val() ) {
+			if ( ! $( 'textarea#post_note_content' ).val() ) {
 				return;
 			}
 
@@ -28,8 +39,8 @@ jQuery( function ( $ ) {
 			var data = {
 				action:    'pixelgrade_wppostnotes_add_post_note',
 				post_id:   pixelgrade_wppostnotes_metabox.post_id,
-				note:      $( 'textarea#add_post_note' ).val(),
-				note_type: $( 'select#order_note_type' ).val(),
+				note:      $( 'textarea#post_note_content' ).val(),
+				note_type: $( 'select#post_note_type' ).val(),
 				security:  pixelgrade_wppostnotes_metabox.add_post_note_nonce
 			};
 
@@ -37,14 +48,14 @@ jQuery( function ( $ ) {
 				$( 'ul.post_notes .no-items' ).remove();
 				$( 'ul.post_notes' ).prepend( response );
 				$( '#pixelgrade_wppostnotes-metabox' ).unblock();
-				$( '#add_post_note' ).val( '' );
+				$( '#post_note_content' ).val( '' );
 			});
 
 			return false;
 		},
 
 		delete_post_note: function() {
-			if ( window.confirm( pixelgrade_wppostnotes_metabox.i18n_delete_note ) ) {
+			if ( window.confirm( pixelgrade_wppostnotes_metabox.i18n_delete_note_confirm ) ) {
 				var note = $( this ).closest( 'li.note' );
 
 				$( note ).block({

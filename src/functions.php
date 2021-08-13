@@ -12,11 +12,13 @@ declare ( strict_types=1 );
 namespace Pixelgrade\WPPostNotes;
 
 /**
- * Get an order note.
+ * Get a post note.
  *
  * @since  0.1.0
- * @param  int|\WP_Comment $data Note ID (or WP_Comment instance for internal use only).
- * @return \stdClass|null        Object with order note details or null when does not exists.
+ *
+ * @param int|\WP_Comment $data Note ID (or WP_Comment instance for internal use only).
+ *
+ * @return \stdClass|null        Object with order note details or null when does not exist.
  */
 function get_note( $data ) {
 	if ( is_numeric( $data ) ) {
@@ -27,50 +29,56 @@ function get_note( $data ) {
 		return null;
 	}
 
+	$note_data = [
+		'id'           => (int) $data->comment_ID,
+		'date_created' => string_to_datetime( $data->comment_date ),
+		'content'      => $data->comment_content,
+		'note_type'    => get_comment_meta( $data->comment_ID, 'post_note_type', true ),
+		'added_by'     => __( 'WordPress', 'pixelgrade-wppostnotes' ) === $data->comment_author ? 'system' : $data->comment_author,
+	];
+
+	if ( empty( $note_data['note_type'] ) ) {
+		$note_data['note_type'] = 'internal';
+	}
+
 	return (object) apply_filters(
 		'pixelgrade_wppostnotes/get_note',
-		array(
-			'id'            => (int) $data->comment_ID,
-			'date_created'  => string_to_datetime( $data->comment_date ),
-			'content'       => $data->comment_content,
-			'customer_note' => (bool) get_comment_meta( $data->comment_ID, 'is_customer_note', true ),
-			'added_by'      => __( 'WordPress', 'woocommerce' ) === $data->comment_author ? 'system' : $data->comment_author,
-		),
+		$note_data,
 		$data
 	);
 }
 
 /**
- * Get order notes.
+ * Get post notes.
  *
  * @since  0.1.0
  *
- * @param array     $args          Query arguments {
- *     Array of query parameters.
+ * @param array $args         Query arguments {
+ *                            Array of query parameters.
  *
- *     @type string $limit         Maximum number of notes to retrieve.
+ * @type string $limit        Maximum number of notes to retrieve.
  *                                 Default empty (no limit).
- *     @type int    $post_id      Limit results to those affiliated with a given post ID.
+ * @type int    $post_id      Limit results to those affiliated with a given post ID.
  *                                 Default 0.
- *     @type array  $post__in     Array of post IDs to include affiliated notes for.
+ * @type array  $post__in     Array of post IDs to include affiliated notes for.
  *                                 Default empty.
- *     @type array  $post__not_in Array of post IDs to exclude affiliated notes for.
+ * @type array  $post__not_in Array of post IDs to exclude affiliated notes for.
  *                                 Default empty.
- *     @type string $orderby       Define how should sort notes.
+ * @type string $orderby      Define how should sort notes.
  *                                 Accepts 'date_created', 'date_created_gmt' or 'id'.
  *                                 Default: 'id'.
- *     @type string $order         How to order retrieved notes.
+ * @type string $order        How to order retrieved notes.
  *                                 Accepts 'ASC' or 'DESC'.
  *                                 Default: 'DESC'.
- *     @type string $type          Define what type of note should retrieve.
- *                                 Accepts 'customer', 'internal' or empty for both.
+ * @type string $type         Define what type of note should retrieve.
+ *                                 Accepts 'internal' or empty string for internal notes. Other post note types as configured.
  *                                 Default empty.
  * }
  * @return \stdClass[]              Array of stdClass objects with order notes details.
  */
-function get_notes( array $args ) {
+function get_notes( array $args ): array {
 	$key_mapping = array(
-		'limit'         => 'number',
+		'limit' => 'number',
 	);
 
 	foreach ( $key_mapping as $query_key => $db_key ) {
@@ -87,24 +95,31 @@ function get_notes( array $args ) {
 		'id'               => 'comment_ID',
 	);
 
-	$args['orderby'] = ! empty( $args['orderby'] ) && in_array( $args['orderby'], array( 'date_created', 'date_created_gmt', 'id' ), true ) ? $orderby_mapping[ $args['orderby'] ] : 'comment_ID';
+	$args['orderby'] = ! empty( $args['orderby'] ) && in_array( $args['orderby'], array(
+		'date_created',
+		'date_created_gmt',
+		'id',
+	), true ) ? $orderby_mapping[ $args['orderby'] ] : 'comment_ID';
 
-	// Set WooCommerce order type.
-	if ( isset( $args['type'] ) && 'customer' === $args['type'] ) {
-		$args['meta_query'] = array( // WPCS: slow query ok.
-			array(
-				'key'     => 'is_customer_note',
-				'value'   => 1,
-				'compare' => '=',
-			),
-		);
-	} elseif ( isset( $args['type'] ) && 'internal' === $args['type'] ) {
-		$args['meta_query'] = array( // WPCS: slow query ok.
-			array(
-				'key'     => 'is_customer_note',
-				'compare' => 'NOT EXISTS',
-			),
-		);
+	// Set post note type.
+	if ( isset( $args['type'] ) ) {
+		if ( empty( $args['type'] ) || 'internal' === $args['type'] ) {
+			$args['meta_query'] = array( // WPCS: slow query ok.
+				array(
+					'key'     => 'post_note_type',
+					'compare' => 'NOT EXISTS',
+				),
+			);
+		}
+		if ( ! empty( $args['type'] ) ) {
+			$args['meta_query'] = array( // WPCS: slow query ok.
+				array(
+					'key'     => 'post_note_type',
+					'value'   => $args['type'],
+					'compare' => '=',
+				),
+			);
+		}
 	}
 
 	// Set correct comment type.
@@ -125,69 +140,39 @@ function get_notes( array $args ) {
 	return array_filter( array_map( 'Pixelgrade\WPPostNotes\get_note', $notes ) );
 }
 
-///**
-// * List order notes (public) for the customer.
-// *
-// * @return array
-// */
-//function get_customer_post_notes() {
-//	$notes = array();
-//	$args  = array(
-//		'post_id' => $this->get_id(),
-//		'approve' => 'approve',
-//		'type'    => '',
-//	);
-//
-//	remove_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ) );
-//
-//	$comments = get_comments( $args );
-//
-//	foreach ( $comments as $comment ) {
-//		if ( ! get_comment_meta( $comment->comment_ID, 'is_customer_note', true ) ) {
-//			continue;
-//		}
-//		$comment->comment_content = make_clickable( $comment->comment_content );
-//		$notes[]                  = $comment;
-//	}
-//
-//	add_filter( 'comments_clauses', array( 'WC_Comments', 'exclude_order_comments' ) );
-//
-//	return $notes;
-//}
-
 /**
  * Create a post note.
  *
  * @since  0.1.0
  *
- * @param int    $post_id          Post ID.
- * @param string $note             Note to add.
- * @param bool   $is_customer_note If this is a costumer note.
- * @param bool   $added_by_user    If note is create by a user.
+ * @param int    $post_id        Post ID.
+ * @param string $note           Note to add.
+ * @param string $post_note_type Optional. The post note type. Leave empty for default, internal post notes.
+ * @param bool   $added_by_user  Optional. If note is create by a user.
  *
  * @return int|\WP_Error             Integer when created or WP_Error when found an error.
  */
-function create_note( int $post_id, string $note, bool $is_customer_note, bool $added_by_user ) {
+function create_note( int $post_id, string $note, string $post_note_type = '', bool $added_by_user = false ) {
 	$post = get_post( $post_id );
 
 	if ( ! $post ) {
-		return new \WP_Error( 'invalid_post_id', __( 'Invalid post ID.', 'woocommerce' ), array( 'status' => 400 ) );
+		return new \WP_Error( 'invalid_post_id', __( 'Invalid post ID.', 'pixelgrade-wppostnotes' ), array( 'status' => 400 ) );
 	}
 
-	return add_note( $post, $note, (int) $is_customer_note, $added_by_user );
+	return add_note( $post, $note, $post_note_type, $added_by_user );
 }
 
 /**
  * Adds a note (comment) to a post. Post must exist.
  *
- * @param \WP_Post $post          Post to add note to.
- * @param string   $note          Note content to add.
- * @param int      $is_customer_note  Is this a note for the user?.
- * @param bool     $added_by_user Was the note added by a user?.
+ * @param \WP_Post $post           Post to add note to.
+ * @param string   $note           Note content to add.
+ * @param string   $post_note_type Optional. The post note type. Leave empty for default, internal post notes.
+ * @param bool     $added_by_user  Optional. Was the note added by a user?
  *
  * @return int                       Comment/Note ID.
  */
-function add_note( \WP_Post $post , string $note, int $is_customer_note = 0, bool $added_by_user = false ): int {
+function add_note( \WP_Post $post, string $note, string $post_note_type = '', bool $added_by_user = false ): int {
 	if ( ! $post->ID ) {
 		return 0;
 	}
@@ -197,14 +182,24 @@ function add_note( \WP_Post $post , string $note, int $is_customer_note = 0, boo
 		$comment_author       = $user->display_name;
 		$comment_author_email = $user->user_email;
 	} else {
-		$comment_author        = __( 'WordPress', 'woocommerce' );
-		$comment_author_email  = strtolower( __( 'WordPress', 'woocommerce' ) ) . '@';
+		$comment_author       = __( 'WordPress', 'pixelgrade-wppostnotes' );
+		$comment_author_email = strtolower( __( 'WordPress', 'pixelgrade-wppostnotes' ) ) . '@';
 		$comment_author_email .= isset( $_SERVER['HTTP_HOST'] ) ? str_replace( 'www.', '', sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : 'noreply.com'; // WPCS: input var ok.
-		$comment_author_email  = sanitize_email( $comment_author_email );
+		$comment_author_email = sanitize_email( $comment_author_email );
 	}
-	$commentdata = apply_filters(
+
+	/**
+	 * Filters the comment data before a post note is added to the database.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array  $comment_data   The comment data.
+	 * @param string $post_note_type The post note type. Empty means internal, default post note.
+	 * @param bool   $added_by_user  If the note was added by a user.
+	 */
+	$comment_data = apply_filters(
 		'pixelgrade_wppostnotes/new_post_note_data',
-		array(
+		[
 			'comment_post_ID'      => $post->ID,
 			'comment_author'       => $comment_author,
 			'comment_author_email' => $comment_author_email,
@@ -214,36 +209,28 @@ function add_note( \WP_Post $post , string $note, int $is_customer_note = 0, boo
 			'comment_type'         => 'post_note',
 			'comment_parent'       => 0,
 			'comment_approved'     => 1,
-		),
-		array(
-			'order_id'         => $post->ID,
-			'is_customer_note' => $is_customer_note,
-		)
+		],
+		$post_note_type,
+		$added_by_user
 	);
 
-	$comment_id = wp_insert_comment( $commentdata );
+	$comment_id = wp_insert_comment( $comment_data );
 
-	if ( $is_customer_note ) {
-		add_comment_meta( $comment_id, 'is_customer_note', 1 );
-
-		do_action(
-			'pixelgrade_wppostnotes/new_customer_note',
-			array(
-				'order_id'      => $post->ID,
-				'customer_note' => $commentdata['comment_content'],
-			)
-		);
+	if ( ! empty( $post_note_type ) && 'internal' !== $post_note_type ) {
+		add_comment_meta( $comment_id, 'post_note_type', $post_note_type );
 	}
 
 	/**
 	 * Action hook fired after a post note is added.
 	 *
-	 * @param int      $post_note_id Post note ID.
-	 * @param \WC_Order $post         Post data.
-	 *
 	 * @since 0.1.0
+	 *
+	 * @param int      $post_note_id   Post note ID (comment ID).
+	 * @param \WP_Post $post           Post data.
+	 * @param string   $post_note_type The post note type. Empty means internal, default post note.
+	 * @param bool     $added_by_user  If the note was added by a user.
 	 */
-	do_action( 'pixelgrade_wppostnotes/post_note_added', $comment_id, $post );
+	do_action( 'pixelgrade_wppostnotes/post_note_added', $comment_id, $post, $post_note_type, $added_by_user );
 
 	return $comment_id;
 }
@@ -253,7 +240,7 @@ function add_note( \WP_Post $post , string $note, int $is_customer_note = 0, boo
  *
  * @since  0.1.0
  *
- * @param int $note_id Order note.
+ * @param int $note_id Post note ID (the comment ID).
  *
  * @return bool         True on success, false on failure.
  */
@@ -262,12 +249,15 @@ function delete_note( int $note_id ): bool {
 }
 
 /**
- * @param       $time
- * @param false $gmt
+ * Convert string value to \DateTimeImmutable instance with the appropriate timezone set.
+ * @since  0.1.0
  *
- * @return \DateTimeImmutable|false
+ * @param       $time
+ * @param false $gmt Optional. Default to false.
+ *
+ * @return \DateTimeImmutable|false DateTimeImmutable or false on failure.
  */
-function string_to_datetime( $time, $gmt = false ) {
+function string_to_datetime( $time, bool $gmt = false ) {
 	$wp_timezone = wp_timezone();
 
 	if ( $gmt ) {
@@ -299,6 +289,7 @@ function get_date_format() {
 		// Return default date format if the option is empty.
 		$date_format = 'F j, Y';
 	}
+
 	return apply_filters( 'pixelgrade_wppostnotes/date_format', $date_format );
 }
 
@@ -312,6 +303,7 @@ function get_time_format() {
 		// Return default time format if the option is empty.
 		$time_format = 'g:i a';
 	}
+
 	return apply_filters( 'pixelgrade_wppostnotes/time_format', $time_format );
 }
 
