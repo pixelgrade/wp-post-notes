@@ -78,7 +78,7 @@
 	  "tests": "./vendor/bin/phpunit --colors=always",
 	  "tests-unit": "./vendor/bin/phpunit --testsuite=Unit --colors=always",
 	  "tests-integration": "./vendor/bin/phpunit --testsuite=Integration --colors=always",
-	  "makepot": "./vendor/bin/wp i18n make-pot . languages/pixelgradelt-records.pot",
+	  "makepot": "./vendor/bin/wp i18n make-pot ./src languages/wp-post-notes.pot --domain=pixelgrade-wppostnotes",
 	  "prepare-for-release": [
 		"composer install",
 		"composer makepot",

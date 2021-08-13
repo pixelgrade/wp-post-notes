@@ -1,104 +1,78 @@
-# Copyright (C) 2021
-# This file is distributed under the same license as the  package.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-post-notes\n"
-"POT-Creation-Date: 2021-08-13 08:16:57+00:00\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2021-MO-DA HO:MI+ZONE\n"
+"Report-Msgid-Bugs-To: \n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"X-Generator: node-wp-i18n 1.2.6\n"
-"Language: en\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Country: United States\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: "
-"__;_e;_x:1,2c;_ex:1,2c;_n:1,2;_nx:1,2,4c;_n_noop:1,2;_nx_noop:1,2,3c;esc_"
-"attr__;esc_html__;esc_attr_e;esc_html_e;esc_attr_x:1,2c;esc_html_x:1,2c;\n"
-"X-Poedit-Basepath: ../\n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Poedit-Bookmarks: \n"
-"X-Textdomain-Support: yes\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2021-08-13T10:55:12+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.5.0\n"
+"X-Domain: pixelgrade-wppostnotes\n"
 
-#: src/Ajax.php:76
-#. translators: $1: Date created, $2 Time created
-msgid "added on %1$s at %2$s"
-msgstr ""
-
-#: src/Ajax.php:82 src/views/html-post-notes.php:38
-#. translators: %s: note author
-msgid "by %s"
-msgstr ""
-
-#: src/Ajax.php:86 src/views/html-post-notes.php:41
-msgid "Delete note"
-msgstr ""
-
-#: src/MetaBox.php:47
-msgid "Private note"
-msgstr ""
-
-#: src/MetaBox.php:48
-msgid "Note to customer"
-msgstr ""
-
-#: src/PostNotes.php:101
-msgid "Add note"
-msgstr ""
-
-#: src/PostNotes.php:102
-msgid ""
-"Add a note for your reference, or add a customer note (the user will be "
-"notified)."
-msgstr ""
-
-#: src/PostNotes.php:103
-msgid "Note type"
-msgstr ""
-
-#: src/PostNotes.php:105
-#. translators: Add post note button label.
-msgid "Add"
-msgstr ""
-
-#: src/PostNotes.php:106
-msgid "Are you sure you wish to delete this note? This action cannot be undone."
-msgstr ""
-
-#: src/PostNotes.php:113
-msgid "WP Post Notes cannot be booted outside of a WordPress environment."
-msgstr ""
-
-#: src/PostNotes.php:117
-msgid "WP Post Notes must be booted before the \"init\" WordPress action has fired."
-msgstr ""
-
-#: src/PostNotes.php:234
-#. translators: %s: The post type singular name
-msgid "%s notes"
-msgstr ""
-
-#: src/functions.php:39 src/functions.php:206 src/functions.php:207
+#: functions.php:37
+#: functions.php:185
+#: functions.php:186
 msgid "WordPress"
 msgstr ""
 
-#: src/functions.php:180
+#: functions.php:159
 msgid "Invalid post ID."
 msgstr ""
 
-#: src/views/html-post-notes.php:32
-#. translators: %1$s: note date %2$s: note time
-msgid "%1$s at %2$s"
+#: PostNotes.php:77
+msgid "WP Post Notes cannot be booted outside of a WordPress environment."
 msgstr ""
 
-#: src/views/html-post-notes.php:48
+#: PostNotes.php:81
+msgid "WP Post Notes must be booted before the \"init\" WordPress action has fired."
+msgstr ""
+
+#: PostNotes.php:193
+msgid "Internal note"
+msgstr ""
+
+#: PostNotes.php:197
+msgid "Add note"
+msgstr ""
+
+#: PostNotes.php:198
+msgid "Add a note for your reference, or add a customer note (the user will be notified)."
+msgstr ""
+
+#: PostNotes.php:199
+msgid "Note type"
+msgstr ""
+
+#. translators: Add post note button label.
+#: PostNotes.php:201
+msgid "Add"
+msgstr ""
+
+#: PostNotes.php:202
+msgid "Delete note"
+msgstr ""
+
+#: PostNotes.php:203
+msgid "Are you sure you wish to delete this note? This action cannot be undone."
+msgstr ""
+
+#: PostNotes.php:205
 msgid "There are no notes yet."
 msgstr ""
 
-#: tests/phpunit/Fixture/wp-content/plugins/hello.php:62
-msgid "Quote from Hello Dolly song, by Jerry Herman:"
+#. translators: %s: The post type singular name
+#: PostNotes.php:279
+msgid "%s notes"
+msgstr ""
+
+#: views/html-post-note.php:32
+msgid "added on %1$s at %2$s"
+msgstr ""
+
+#. translators: %s: note author
+#: views/html-post-note.php:42
+msgid "by %s"
 msgstr ""
