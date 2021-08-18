@@ -223,7 +223,7 @@ class PostNotes {
 		wp_register_script(
 			'pixelgrade_wppostnotes-metabox',
 			\path_join( URL, 'assets/js/notes-metabox.js' ),
-			[ 'jquery', 'jquery-blockui', 'jquery-tiptip', ],
+			[ 'jquery', 'jquery-blockui', 'jquery-tiptip', 'jquery-effects-shake' ],
 			'20210805',
 			true
 		);

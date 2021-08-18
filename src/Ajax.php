@@ -44,8 +44,8 @@ class Ajax {
 	public function add_ajax_events() {
 
 		$ajax_events = [
-				'add_post_note',
-				'delete_post_note',
+			'add_post_note',
+			'delete_post_note',
 		];
 
 		foreach ( $ajax_events as $ajax_event ) {
@@ -62,7 +62,7 @@ class Ajax {
 		check_ajax_referer( 'add-post-note', 'security' );
 
 		if ( ! isset( $_POST['post_id'], $_POST['note'], $_POST['note_type'] ) || ! current_user_can( 'edit_post', absint( $_POST['post_id'] ) ) ) {
-			wp_die( - 1 );
+			wp_die( -1, 403 );
 		}
 
 		$post_id   = absint( $_POST['post_id'] );
@@ -89,8 +89,8 @@ class Ajax {
 	public function delete_post_note() {
 		check_ajax_referer( 'delete-post-note', 'security' );
 
-		if ( ! isset( $_POST['note_id'] ) || ! current_user_can( 'edit_post', absint( $_POST['note_id'] ) ) ) {
-			wp_die( - 1 );
+		if ( ! isset( $_POST['note_id'] ) || ! current_user_can( 'edit_comment', absint( $_POST['note_id'] ) ) ) {
+			wp_die( -1, 403 );
 		}
 
 		$note_id = absint( $_POST['note_id'] );
