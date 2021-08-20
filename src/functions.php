@@ -182,6 +182,10 @@ function add_note( \WP_Post $post, string $note, string $post_note_type = '', bo
 		$comment_author       = $user->display_name;
 		$comment_author_email = $user->user_email;
 	} else {
+		// Regardless if we have been instructed to mark the note as being added by a user,
+		// if we couldn't find a valid user mark it as not added by a user.
+		$added_by_user = false;
+
 		$comment_author       = __( 'WordPress', 'pixelgrade-wppostnotes' );
 		$comment_author_email = strtolower( __( 'WordPress', 'pixelgrade-wppostnotes' ) ) . '@';
 		$comment_author_email .= isset( $_SERVER['HTTP_HOST'] ) ? str_replace( 'www.', '', sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : 'noreply.com'; // WPCS: input var ok.
